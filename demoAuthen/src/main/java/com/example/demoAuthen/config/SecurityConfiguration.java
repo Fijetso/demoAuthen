@@ -79,8 +79,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// Khi người dùng đã login, với vai trò USER, Nhưng truy cập vào trang yêu cầu
 		// vai trò ADMIN, sẽ chuyển hướng tới trang /403
 		http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
-		http.authorizeRequests().anyRequest().authenticated().and().oauth2Login().userInfoEndpoint()
+		http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().oauth2Login().userInfoEndpoint()
 				.userService(this.oauth2UserService()).oidcUserService(this.oidcUserService());
+		http.logout()
+		.logoutSuccessUrl("/login")
+		.logoutUrl("/logout")
+		.permitAll();
 	}
 
 	private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
