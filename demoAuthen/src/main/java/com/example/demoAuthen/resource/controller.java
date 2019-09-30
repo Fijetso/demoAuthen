@@ -16,9 +16,14 @@ public class controller {
 	public String hello() {
 		return "Hello USER";
 	}
-//	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@GetMapping("/secured/all")
-	public String securedHello() {
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@GetMapping("/secured/user")
+	public String securedUserHello() {
+		return "Hello USER";
+	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@GetMapping("/secured/admin")
+	public String securedAdminHello() {
 		return "Hello ADMIN";
 	}
 	private String getUserName() {
