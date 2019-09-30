@@ -129,20 +129,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				User newUser = new User(oidcUser.getFullName(), oidcUser.getFamilyName(), oidcUser.getEmail(), roles);
 				userRepository.save(newUser);
 			}
-//			optionalUser.ifPresentOrElse(user ->{
-//				user.getRoles().forEach(
-//					authority ->{
-//						authorities.add(new SimpleGrantedAuthority("ROLE_" + authority.getName()));
-//						});
-//					},
-//					()-> {
-//						authorities.addAll(oidcUser.getAuthorities());
-//						Set<Role> roles = new HashSet<>();
-//						roles.add(roleRepository.findByName("USER").get());
-//						User newUser = new User(oidcUser.getFullName(),oidcUser.getFamilyName(),oidcUser.getEmail(), roles);
-//						userRepository.save(newUser);
-//						});
-			/// lỗi chỗ này, vs k lưu vô role_user
 			OidcUserInfo oidcUserInfo = new OidcUserInfo(authorities, oidcUser.getIdToken());
 			oidcUserInfo.setUsername(oidcUser.getFullName()); /// getUserName()
 			return oidcUserInfo;
