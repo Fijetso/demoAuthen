@@ -1,6 +1,7 @@
 package com.example.demoAuthen.config;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,16 +87,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 		return (OAuth2UserRequest userRequest) -> {
 			OAuth2User oauth2User = delegate.loadUser(userRequest);
-			String email = (String) oauth2User.getAttributes().get("email");
-			Optional<User> optionalUser = userRepository.findByEmail(email);
+			String emailOrUsername = (String) oauth2User.getAttributes().get("email");
+			if (emailOrUsername == null) {
+				emailOrUsername = (String) oauth2User.getAttributes().get("login");
+			}
+			Optional<User> optionalUser = userRepository.findByEmail(emailOrUsername);
 			Set<GrantedAuthority> authorities = new HashSet<>();
-			optionalUser.ifPresent(user -> {
-				user.getRoles().forEach(authority -> {
+			if (optionalUser.isPresent()) {
+				optionalUser.get().getRoles().forEach(authority -> {
 					authorities.add(new SimpleGrantedAuthority("ROLE_" + authority.getName()));
 				});
-			});
+			} else {
+				authorities.addAll(oauth2User.getAuthorities());
+				Set<Role> roles = new HashSet<>();
+				roles.add(roleRepository.findByName("USER").get());
+				Map<String, Object> attributes = oauth2User.getAttributes();
+				User newUser = new User((String) attributes.get("name"), "", emailOrUsername, roles);
+				userRepository.save(newUser);
+			}
 			OAuth2UserInfo oauth2UserInfo = new OAuth2UserInfo(authorities, oauth2User.getAttributes(), "id");
-			oauth2UserInfo.setUsername(optionalUser.get().getName()); /// getUserName()
+			oauth2UserInfo.setUsername(emailOrUsername); /// getUserName()
 			return oauth2User;
 		};
 	}
