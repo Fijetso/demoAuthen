@@ -12,6 +12,8 @@ import com.example.demoAuthen.model.OidcUserInfo;
 @RequestMapping("/rest/hello")
 @RestController
 public class controller {
+	/// OAuth2AuthorizationRequestRedirectFilter
+	private String oauth2AuthorizationBaseUri = "http://localhost:8080/oauth2/authorization"; /// +/github or /google or /facebook
 	@GetMapping("/all")
 	public String hello() {
 		return "Hello USER";
