@@ -70,7 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
-		http.authorizeRequests().antMatchers("/", "/register", "/confirm-account", "/login", "/logout").permitAll();
+		http.authorizeRequests().antMatchers("/", "/register", "/confirm-account", "/reset-password/**", "/login", "/logout").permitAll();
 
 		// Chỉ cho phép user có quyền ADMIN truy cập đường dẫn /admin/**
 		http.authorizeRequests().antMatchers("*/admin/**").access("hasRole('ROLE_ADMIN')");
