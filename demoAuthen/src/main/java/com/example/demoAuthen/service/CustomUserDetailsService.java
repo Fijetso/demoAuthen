@@ -29,6 +29,9 @@ public class CustomUserDetailsService implements UserDetailsService{
 //		.ifPresent(user ->  new CustomUserDetails(user));
 		///khong hieu khuc nay
 		User user = optionalUser.get();
+		if(user.getActive()==0) {
+				throw new RuntimeException("The Account hasn't activated yet");
+		}
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		user.getRoles().forEach(authority ->
 			authorities.add(new SimpleGrantedAuthority("ROLE_"+authority.getName()))
