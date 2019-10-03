@@ -21,7 +21,7 @@ public class User {
 	private String password;
 	private String name;
 	private String lastName;
-	private int active;
+	private int active = 0;
 	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	@JoinTable(name = "user_role", joinColumns = { @JoinColumn(name = "userId") }, inverseJoinColumns = {
 			@JoinColumn(name = "roleId") })
@@ -29,6 +29,7 @@ public class User {
 
 	public User() {
 		super();
+		this.active = 0;
 	}
 
 	public User(User user) {
@@ -41,8 +42,8 @@ public class User {
 		this.userId = user.getUserId();
 	}
 
-	public User(String name, String lastName, String email, Set<Role> roles) {
-		this.active = 1;
+	public User(String name, String lastName, String email, Set<Role> roles, int active) {
+		this.active = active;
 		this.email = email;
 		this.lastName = lastName;
 		this.name = name;

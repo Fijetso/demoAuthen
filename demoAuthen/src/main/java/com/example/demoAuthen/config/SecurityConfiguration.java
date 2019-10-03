@@ -70,7 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
-		http.authorizeRequests().antMatchers("/", "/signup", "/login", "/logout").permitAll();
+		http.authorizeRequests().antMatchers("/", "/register", "/confirm-account", "/login", "/logout").permitAll();
 
 		// Chỉ cho phép user có quyền ADMIN truy cập đường dẫn /admin/**
 		http.authorizeRequests().antMatchers("*/admin/**").access("hasRole('ROLE_ADMIN')");
@@ -81,10 +81,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
 		http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().oauth2Login().userInfoEndpoint()
 				.userService(this.oauth2UserService()).oidcUserService(this.oidcUserService());
-		http.logout()
-		.logoutSuccessUrl("/login")
-		.logoutUrl("/logout")
-		.permitAll();
+		http.logout().logoutSuccessUrl("/login").logoutUrl("/logout").permitAll();
 	}
 
 	private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
@@ -106,7 +103,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				Set<Role> roles = new HashSet<>();
 				roles.add(roleRepository.findByName("USER").get());
 				Map<String, Object> attributes = oauth2User.getAttributes();
-				User newUser = new User((String) attributes.get("name"), "", emailOrUsername, roles);
+				User newUser = new User((String) attributes.get("name"), "", emailOrUsername, roles,1);
 				userRepository.save(newUser);
 			}
 			OAuth2UserInfo oauth2UserInfo = new OAuth2UserInfo(authorities, oauth2User.getAttributes(), "id");
@@ -130,7 +127,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				authorities.addAll(oidcUser.getAuthorities());
 				Set<Role> roles = new HashSet<>();
 				roles.add(roleRepository.findByName("USER").get());
-				User newUser = new User(oidcUser.getFullName(), oidcUser.getFamilyName(), oidcUser.getEmail(), roles);
+				User newUser = new User(oidcUser.getFullName(), oidcUser.getFamilyName(), oidcUser.getEmail(), roles,1);
 				userRepository.save(newUser);
 			}
 			OidcUserInfo oidcUserInfo = new OidcUserInfo(authorities, oidcUser.getIdToken());
