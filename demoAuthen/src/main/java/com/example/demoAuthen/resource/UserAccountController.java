@@ -1,11 +1,16 @@
 package com.example.demoAuthen.resource;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoAuthen.model.ConfirmationToken;
+import com.example.demoAuthen.model.Role;
 import com.example.demoAuthen.model.User;
 import com.example.demoAuthen.repository.ConfirmationTokenRepository;
+import com.example.demoAuthen.repository.RoleRepository;
 import com.example.demoAuthen.repository.UserRepository;
 import com.example.demoAuthen.service.EmailSenderService;
 
@@ -22,6 +29,9 @@ import com.example.demoAuthen.service.EmailSenderService;
 public class UserAccountController {
 	@Autowired
     private UserRepository userRepository;
+	@Autowired
+    private RoleRepository roleRepository;
+
 
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -47,10 +57,14 @@ public class UserAccountController {
             mailMessage.setText("To confirm your account, please click here : "
             +"http://localhost:8080/confirm-account?token="+confirmationToken.getConfirmationToken());
             emailSenderService.sendEmail(mailMessage);
-            
+            String hashPwd = BCrypt.hashpw(user.getPassword(),BCrypt.gensalt());
+            user.setPassword(hashPwd);
+            Set<Role> roles = new HashSet<>();
+            Role userRole = roleRepository.findByName("USER").get();
+            roles.add(userRole);
+            user.setRoles(roles);
             userRepository.save(user);
             confirmationTokenRepository.save(confirmationToken);
-
             return "Successful Registration!";
         }
     }
