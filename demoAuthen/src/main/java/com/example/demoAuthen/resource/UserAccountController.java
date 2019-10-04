@@ -1,15 +1,10 @@
 package com.example.demoAuthen.resource;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,8 +48,10 @@ public class UserAccountController {
 			mailMessage.setText("To confirm your account, please click here : "
 					+ "http://localhost:8080/confirm-account?token=" + confirmationToken.getConfirmationToken());
 			emailSenderService.sendEmail(mailMessage);
-			String hashPwd = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-			user.setPassword(hashPwd);
+
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			String hashedPassword = passwordEncoder.encode(user.getPassword());
+			user.setPassword(hashedPassword);
 			Set<Role> roles = new HashSet<>();
 			Role userRole = roleRepository.findByName("USER").get();
 			roles.add(userRole);
