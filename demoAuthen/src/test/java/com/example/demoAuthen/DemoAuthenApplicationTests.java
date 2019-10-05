@@ -14,7 +14,7 @@ public class DemoAuthenApplicationTests {
 	private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(DemoAuthenApplicationTests.class);
 	@Test
 	public void printHashPassword() {
-		String plainTextPassword = "123456";
+		String plainTextPassword = "15520325";
 		String hashPwd = BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
 		logger.info(hashPwd);
 	}
